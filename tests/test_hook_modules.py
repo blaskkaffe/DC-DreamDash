@@ -1,5 +1,5 @@
-"""The two modules the DreamPi hook uses: the debug log (its code is loaded from modules/debuglog while the module is
-on) and the phone numbers (numbers.json is only read while the module is on). The hook runs inside DreamPi."""
+"""The module the DreamPi hook loads code from: the debug log (its code is loaded from modules/debuglog while the module is
+on). The hook runs inside DreamPi."""
 import builtins
 import json
 import os

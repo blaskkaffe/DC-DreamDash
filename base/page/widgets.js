@@ -469,7 +469,7 @@ W.list=function(s,ctx){var el=h("div",{"class":"wlist"+(s.style==="compact"?" co
  UPD.push(function(){var shown=s.when===undefined||!!val(s.when);if(!shown){if(key!==""){key="";inner.innerHTML="";p.close()}return}paint()});
  hook("settingsClose",function(){p.close()});return el};
 // ---- the standard "edit row": the title and a grey line on the left, a small button on the right (Edit, Add ...), and - once there is
-// something to show - a list of tags underneath. Forms, the phone number table and the colour picks all use this one look.
+// something to show - a list of tags underneath. Forms, the tables and the colour picks all use this one look.
 //   r.el the row   r.btn the button   r.setSub(text)   r.setList(items, onRemove(i))   (an empty or missing list takes no room)
 function editRow(o){var sub=h("span",{"class":"sub"}),title=document.createTextNode(o.title||""),
  btn=h("button",{type:"button","class":"pill-s",text:o.button||"Edit"}),btn2=o.button2?h("button",{type:"button","class":"pill-s",text:o.button2}):null,
@@ -487,7 +487,7 @@ function editRow(o){var sub=h("span",{"class":"sub"}),title=document.createTextN
    row.classList.toggle("lk-fast",speed==="fast")},
   setSub:function(t){setLines(sub,t);sh(sub,!!t)},
   setList:function(items,onRemove){below.innerHTML="";items=items||[];sh(below,items.length>0);if(!items.length)return;below.appendChild(tagList(items,onRemove))}}}
-// the tags of a list (phone numbers, messages): with onRemove(i) each has a remove button, without it they are only shown
+// the tags of a list (messages, favourites): with onRemove(i) each has a remove button, without it they are only shown
 function tagList(items,onRemove){var tags=h("div",{"class":"tags"});
  items.forEach(function(it,i){var t=h("span",{"class":"tag"},[document.createTextNode(it)]);
   if(onRemove){var x=h("button",{type:"button","aria-label":"Remove "+it,html:"&#10005;"});x.onclick=function(e){e.stopPropagation();onRemove(i)};t.appendChild(x)}
@@ -506,7 +506,7 @@ function inlinePanel(el){var q={onclose:null,anchor:null};sh(el,false);
  q.open=function(a){q.anchor=a;sh(el,true)};
  q.close=function(){if(!q.isOpen())return;sh(el,false);q.anchor=null;if(q.onclose)q.onclose()};
  q.toggle=function(a,e){if(e&&e.stopPropagation)e.stopPropagation();if(q.isOpen()&&q.anchor===a)q.close();else q.open(a)};return q}
-// ---- a table to pick values for: groups of short items (phone numbers) with an Add pop-up per group (reply of GET source).
+// ---- a table to pick values for: groups of short items with an Add pop-up per group (reply of GET source).
 // With "edit": true a group is one short row with an Edit button (top right); the pop-up under it holds the group's tags (remove), the
 // Add button (which opens the search / pick area inside the same pop-up), Restore, the help text and Done.
 W.picker=function(s,ctx){var el=h("div",{"class":"wpicker"}),cfg=null,timer=null,addKey=null,
@@ -564,7 +564,7 @@ W.picker=function(s,ctx){var el=h("div",{"class":"wpicker"}),cfg=null,timer=null
  function save(){clearTimeout(timer);paint();timer=setTimeout(function(){var body={};cfg.groups.forEach(function(g){body[g.key]=g.items});
   post(s.source,body,function(r){if(r){cfg=r;paint();ctx.saved();if(s.reload)reloadData(s.reload)}})},100)}      // the data source that shows this list ("reload": its name; the stars of the players box) follows what was saved
  hook("settingsOpen",load);hook("settingsClose",function(){p.close()});return el};
-// ---- rows of "something to do + what triggers it" (phone numbers: an action and the numbers that start it; the colour rows: a look and the
+// ---- rows of "something to do + what triggers it" (the colour rows: a look and the
 // messages that show it). One short row per entry (its title, a grey line and its triggers as tags) with an Edit button; the pop-up under it has
 // the action (a select, when the answer lists "actions"), the row's options (the same controls as a form: switch, choice, select, number, colour,
 // slider, range), the triggers with an Add field (or, with "choices", a list to pick from) and Delete row, Done. "Add row" asks for the action first.

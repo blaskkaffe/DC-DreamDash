@@ -10,7 +10,7 @@
 #                                  hides the LED settings on the page
 #   sudo ./install.sh --led-gpio=21   use GPIO10, 12, 18 (default) or 21 instead
 #   (--led, --led=N and --no-led still work: same as the default, --leds=N and --leds=0)
-#   The LED, Wi-Fi setup, phone numbers, online players and debug log parts are optional modules, one folder each
+#   The LED, Wi-Fi setup, online players and debug log parts are optional modules, one folder each
 #   in modules/ (see "Optional parts" in the README): a folder that is not there is not installed (and one that was
 #   installed before is removed), and the LED / Wi-Fi options below do nothing without their module.
 #   sudo ./install.sh --wifi       add Wi-Fi setup (a temporary access point for joining a network
@@ -84,6 +84,7 @@ mkdir -p "$DEST/sounds"; cp "$SRC"/base/sounds/* "$DEST/sounds/"      # the butt
 # Files an older layout kept next to the base (the features are folders in modules/ now)
 rm -f "$DEST/netswitch_core.py" "$DEST/netswitch_modules.py" "$DEST/netswitch_web.py" "$DEST/netswitch_security.py" "$DEST/netswitch_tz.py" "$DEST/netswitch_gpio.py" \
       "$DEST/netswitch_hook.py" "$DEST/netswitch_hook.pyc" "$DEST/netswitch_probes.py" "$DEST/netswitch_buttons.py"
+rm -f "$DEST/numbers.json"      # the phone numbers were removed: the network is selected over the data channel only
 rm -f "$DEST/netswitch_update.py" "$DEST/static/three.min.js" "$DEST/static/dc-background.js" "$DEST/static/LICENSES.txt" "$DEST/netswitch_led.py" "$DEST/netswitch_led_drivers.py" "$DEST/netswitch_ledconfig.py" "$DEST/netswitch_numbers.py" \
       "$DEST/netswitch_players.py" "$DEST/netswitch_wifi_setup.py" "$DEST/page/led.html" "$DEST/page/led.js" "$DEST/page/led.css" "$DEST/page/players.js"
 

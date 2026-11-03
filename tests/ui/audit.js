@@ -66,8 +66,6 @@ const AUDIT = () => {
     await page.click('[data-box="status led"] .wtrig .srow.edit button.pill-s'); await page.waitForTimeout(300); await check('LED colour edit pop-up');
     await page.click('[data-box="status led"] .pop.open [aria-expanded]'); await page.waitForTimeout(300); await check('LED add messages list');
     await page.keyboard.press('Escape');
-    await page.click('[data-box="special phone numbers"] .wtrig .srow.edit button.pill-s'); await page.waitForTimeout(300); await check('numbers row pop-up');
-    await page.keyboard.press('Escape');
     await page.click('[data-box="status led"] .srow:has-text("Calibration") > button'); await page.waitForTimeout(300); await check('calibration pop-up');
     await page.keyboard.press('Escape');
     await page.click('[data-box="status led"] button[aria-label="Adjust the colours"]'); await page.waitForTimeout(500); await check('LED colours pop-up');

@@ -1,5 +1,7 @@
 # Triggers and actions between modules: design proposal
 
+> **Unified branch note:** the phone-number source described below (the numbers module, `numbers.json`, `switcher` actions done inside DreamPi) was **removed**. Where this proposal mentions numbers, rows of numbers, `11111` or hang-up, read it as history. The `triggers` widget stays (the LED colour rows use it) and the idea of triggers and actions between modules is still open, now on top of the data channel.
+
 **Status: a proposal for approval. Nothing in "What changes" is built yet.** It builds on what `development` already has (the
 numbers rows, `actions` in `module.json`, the `triggers` widget, the LED rows). Back to [CLAUDE.md](../CLAUDE.md).
 

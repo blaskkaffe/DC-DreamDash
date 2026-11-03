@@ -1,8 +1,8 @@
 # DreamPi Netswitch add-on - debug log module, the part that runs inside DreamPi.
 # netswitch_hook.py loads this file only while the module is installed and switched on; without it the hook
 # logs nothing. While recording is on (the file debug_dtmf exists) it writes every modem event DreamPi hears
-# while listening for digits, and the hook's own decisions, to /tmp/dreampi-netswitch-dtmf.log with the time and
-# the milliseconds since the previous line - to diagnose misheard numbers.
+# while DreamPi listens for a call, to /tmp/dreampi-netswitch-dtmf.log with the time and
+# the milliseconds since the previous line - to diagnose modem problems.
 # Runs in DreamPi, so it must stay Python 2.7 and 3 compatible: no f-strings, no type hints.
 import os
 import time

@@ -42,7 +42,7 @@ PULLUP_RETRY = 1.0           # re-apply the pull-up this often while a pin sits 
 
 def toggle_network():
     """Short press: switch the selected network, the same flag file the web
-    page's DCNow!/DCNET buttons and the special phone numbers use."""
+    page's DCNow!/DCNET buttons and openMenu's POST /dcnow and /dcnet use."""
     if os.path.exists(state.FLAG):
         os.remove(state.FLAG)
         net = "DCNow!"

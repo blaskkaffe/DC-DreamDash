@@ -131,7 +131,7 @@ class HttpSecurityTests(unittest.TestCase):
 
     def test_cross_site_posts_are_refused(self):
         evil = {"Host": "127.0.0.1:%d" % self.port, "Origin": "http://evil.example.com"}
-        for path in ("/dcnet", "/numbers", "/wificonnect", "/ledconfig", "/ledrows", "/reboot", "/update/start"):
+        for path in ("/dcnet", "/wificonnect", "/ledconfig", "/ledrows", "/reboot", "/update/start"):
             for extra in ({}, {"X-Requested-With": "x"}, {"Content-Type": "text/plain"}):
                 status, _b, _r = self.req("POST", path, dict(evil, **extra), b"{}")
                 self.assertEqual(status, 403, (path, extra))
@@ -204,7 +204,7 @@ class HttpSecurityTests(unittest.TestCase):
         self.assertEqual(self.req("POST", "/settings-pin", h, b'{"value": true}')[0], 200)
         api = json.loads(self.req("GET", "/api")[1].decode())
         self.assertEqual(api["settings_pin"], {"on": True, "pin": True})
-        for path in ("/colour", "/screen", "/screen/stretch", "/modules", "/buttonconfig", "/numbers", "/clock/beat", "/highlight", "/settings-pin"):
+        for path in ("/colour", "/screen", "/screen/stretch", "/modules", "/buttonconfig", "/clock/beat", "/highlight", "/settings-pin"):
             sec.reset_for_tests()
             self.assertEqual(self.req("POST", path, h, b"{}")[0], 401, path)
         self.assertFalse(os.path.exists(core.SCREEN))
@@ -247,7 +247,7 @@ class HttpSecurityTests(unittest.TestCase):
         self.assertEqual(r.getheader("X-Content-Type-Options"), "nosniff")
 
     def test_negative_content_length_does_not_hang(self):
-        status, _b, _r = self.req("POST", "/numbers", {"X-Requested-With": "x", "Content-Length": "-5"})
+        status, _b, _r = self.req("POST", "/buttonconfig", {"X-Requested-With": "x", "Content-Length": "-5"})
         self.assertEqual(status, 400)
 
     def test_wifi_connect_cuts_long_values(self):

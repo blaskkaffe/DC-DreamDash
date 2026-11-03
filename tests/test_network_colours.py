@@ -114,7 +114,7 @@ class ModuleColourTests(unittest.TestCase):
         self.assertEqual(core.module_colours("switcher"), {"selector": "network", "dcnow": "orange", "dcnet": "blue"})
 
     def test_a_module_without_colours_has_none(self):
-        self.assertEqual(core.module_colours("numbers"), {})
+        self.assertEqual(core.module_colours("wifi"), {})
 
 
 class TintTests(unittest.TestCase):

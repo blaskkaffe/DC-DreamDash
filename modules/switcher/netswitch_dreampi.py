@@ -4,34 +4,27 @@ DreamPi Netswitch add-on - the network switcher module's integration with DreamP
 
 Loaded automatically by Python (through a .pth file written by modules/switcher/install.sh) but does nothing unless
 the running program imports DreamPi's netlink.py from /home/pi/dreampi.
-It then wraps Netlink.check_number() with these rules:
+It then wraps Netlink.check_number() with one rule:
 
-  numbers  Rows of numbers set on the web page (numbers.json, read by the numbers module's hook file). A row = an action that a
-           module announces (module.json "actions", done by that module's "hook" file: this module has toggle / DCNow! / DCNET) +
-           the numbers that trigger it + "hang up" (do not answer, busy tone). A dialed string only has to END with a number; the
-           longest match decides and every row holding that number runs. Without the numbers module there is one row, DCNow!,
-           11111 (openMenu dials 1111111, which ends with it).
-  others   Go to whichever network is selected (website or the numbers above).
-           Only calls DreamPi would send to its normal PPP are redirected;
-           Netlink/XBAND codes and the built-in *69 prefix are untouched.
+  A call DreamPi would send to its normal PPP goes to DCNET when DCNET is selected (and enabled in netlink_config.ini).
+  Netlink/XBAND codes, DreamPi's own *69/*70 prefixes and idle results are untouched.
 
-The selection is the file dcnet_mode (DCNow! is selected again after every reboot).
+The network is never chosen by the number that was dialed: it is selected over the data channel (the page's buttons, the
+GPIO buttons, openMenu's POST /dcnow and /dcnet). The selection is the file dcnet_mode (DCNow! is selected again after
+every reboot).
 It also reports DreamPi's state (starting / ready / in a call) to
 /tmp/dreampi-netswitch.state for the web page. Modules (modules/ in
-the add-on folder) hook in here through the "hook" file in their module.json: "switcher" does the network actions, "numbers" - without it
-numbers.json is ignored and the default row above is used - and "debuglog" - it provides the code
+the add-on folder) hook in here through the "hook" file in their module.json: "debuglog" provides the code
 that, while the file debug_dtmf exists, logs every modem event while DreamPi
-listens for digits to /tmp/dreampi-netswitch-dtmf.log, to diagnose misheard
-numbers (modules/debuglog/netswitch_hookdebug.py; without the module nothing is logged).
+listens for the call to /tmp/dreampi-netswitch-dtmf.log (modules/debuglog/netswitch_hookdebug.py;
+without the module nothing is logged).
 No DreamPi file is modified. Written for both Python 2.7 and 3.
 """
 import json
 import logging
-import math
 import os
 import re
 import sys
-import threading
 import time
 
 BASE_DIR = "/opt/dreampi-netswitch"
@@ -40,13 +33,10 @@ STATUS = "/tmp/dreampi-netswitch.active"
 STATE = "/tmp/dreampi-netswitch.state"
 DEBUG_DTMF = os.path.join(BASE_DIR, "debug_dtmf")  # exists = log modem events (see modules/debuglog)
 MODULES_DIR = os.path.join(BASE_DIR, "modules")
-MODULES_STATE = os.path.join(BASE_DIR, "modules.json")   # {"numbers": true, ...} from the Modules menu
+MODULES_STATE = os.path.join(BASE_DIR, "modules.json")   # {"debuglog": true, ...} from the Modules menu
 MODEM = "/tmp/dreampi-netswitch.modem"
 MODEM_PORT = "/tmp/dreampi-netswitch.port"   # the serial device DreamPi opened, e.g. /dev/ttyUSB0
 NETLINK_DIR = "/home/pi/dreampi"
-
-# the one row used without the numbers module: DCNow! on 11111 (the numbers module's own default is the same)
-DEFAULT_ROW = {"action": "switcher.dcnow", "items": ["11111"], "opts": {}}
 
 # __builtin__ first: on Python 2 the "future" package can provide a fake
 # "builtins" module, and patching that would do nothing.
@@ -90,7 +80,7 @@ def _write_state(state):
 
 def _module_active(name):
     """The module is installed (its folder with a module.json) and not switched off in the Modules menu.
-    A module without an entry in modules.json counts as on (numbers and debuglog are on by default)."""
+    A module without an entry in modules.json counts as on (debuglog is on by default)."""
     if not os.path.exists(os.path.join(MODULES_DIR, name, "module.json")):
         return False
     try:
@@ -151,84 +141,6 @@ def _watch_serial(modem):
         part.watch(modem)
 
 
-# ------------------------------------------------ "switch only" numbers (#)
-# A special number followed by # (e.g. 5550002#) only switches the network:
-# DreamPi doesn't answer (like its own *69 / *70 codes), and the dial tone is
-# replaced by a busy tone for a few seconds so the Dreamcast gives up at once
-# instead of waiting for an answer.
-BUSY_SECONDS = 4.0
-_busy_tone = [None]
-_busy_until = [0.0]
-
-
-def _make_busy_tone():
-    """North American busy tone (480 + 620 Hz, 0.5 s on / 0.5 s off) as
-    8-bit unsigned 8 kHz PCM, the format DreamPi streams its dial tone in."""
-    if _busy_tone[0] is None:
-        rate, out = 8000, bytearray()
-        for i in range(rate):          # one second: 0.5 s tone, 0.5 s silence
-            t = float(i) / rate
-            v = 0.0 if i >= rate // 2 else \
-                0.5 * (math.sin(2 * math.pi * 480 * t) + math.sin(2 * math.pi * 620 * t))
-            out.append(max(0, min(255, int(round(128 + 90 * v)))))
-        _busy_tone[0] = bytes(out)
-    return _busy_tone[0]
-
-
-def _play_busy(modem):
-    """Swap DreamPi's dial tone buffer for a busy tone, then swap it back.
-    modem.update() keeps streaming whatever buffer is set, so nothing else
-    in DreamPi changes."""
-    try:
-        busy = _make_busy_tone()
-        current = getattr(modem, "_dial_tone_wav", None)
-        if not current or not getattr(modem, "_sending_tone", False):
-            return False
-        if current is not busy:            # keep the real dial tone, even when
-            modem._netswitch_dial = current    # two switches come in quick succession
-        dial = getattr(modem, "_netswitch_dial", None)
-        if not dial:
-            return False
-        modem._dial_tone_wav = busy
-        modem._dial_tone_counter = 0
-        _busy_until[0] = time.time() + BUSY_SECONDS
-
-        def restore():
-            if time.time() >= _busy_until[0] - 0.05 and getattr(modem, "_dial_tone_wav", None) is busy:
-                modem._dial_tone_wav = dial
-                modem._dial_tone_counter = 0
-        timer = threading.Timer(BUSY_SECONDS, restore)
-        timer.daemon = True
-        timer.start()
-        return True
-    except Exception:
-        return False
-
-
-def _matches(raw_string):
-    """[(row, number)] for what was dialed: the numbers module's saved rows while it is on, else the one default row (the dialed
-    string only has to end with its number)."""
-    part = _module_part("numbers")
-    if part is not None:
-        return part.matches(raw_string, BASE_DIR)
-    row = DEFAULT_ROW
-    return [(row, raw_string[-len(n):]) for n in row["items"] if raw_string and raw_string.endswith(n)][:1]
-
-
-class _Call(object):
-    """What an action gets: the dialed string, the number it matched and the add-on's folder; log(text) writes to DreamPi's log."""
-    def __init__(self, raw, number, log):
-        self.raw, self.number, self.log, self.base_dir = raw, number, log, BASE_DIR
-
-
-def _action(action_id):
-    """The function that does an action ("switcher.dcnow" -> the switcher's hook file, ACTIONS["dcnow"]), or None."""
-    name, _dot, key = str(action_id).partition(".")
-    part = _module_part(name) if name else None
-    fn = getattr(part, "ACTIONS", {}).get(key) if part is not None else None
-    return fn if callable(fn) else None
-
-
 def _patch(module):
     cls = getattr(module, "Netlink", None)
     original = getattr(cls, "check_number", None) if cls is not None else None
@@ -239,32 +151,6 @@ def _patch(module):
         return
 
     def check_number(self, raw_string):
-        matches = _matches(raw_string)
-        if raw_string:
-            _dtmf_log("add-on: number heard %r (%s)" % (raw_string, "matches %s" % ", ".join(r["action"] for r, _n in matches) if matches else "no special number"))
-        # run the actions of the rows this number is in; a row with "hang up" makes the call end here (no answer, busy tone, like *70)
-        done, hangup = [], False
-        for row, number in matches:
-            fn = _action(row["action"])
-            if fn is None:                       # the module of this action is off or gone: the row waits
-                continue
-            try:
-                done.append(fn(_Call(raw_string, number, lambda text: _log(self, text))) or row["action"])
-                hangup = hangup or bool(row.get("opts", {}).get("hangup"))
-            except Exception as e:
-                _log(self, "action %s failed: %s" % (row["action"], e))
-        if done:
-            _log(self, "%s dialed: %s" % (raw_string, ", ".join(done)))
-        if hangup:
-            try:
-                busy = _play_busy(getattr(self, "modem", None))
-                _log(self, "not answering%s" % (", busy tone sent" if busy else ""))
-                _write_modem("%s by %s, call not answered" % (", ".join(done), raw_string))
-            except Exception as e:
-                _log(self, "could not hang up: %s" % e)
-            self.mode = "idle"
-            return {"client": "idle", "dial_string": raw_string}
-
         result = original(self, raw_string)
 
         try:
@@ -301,7 +187,6 @@ _MODEM_EVENTS = [
     (r"^Unable to detect an internet connection", "Waiting for internet", None),
     (r"^Opening serial interface to (\S+)", "Opening modem on %s", "port"),
     (r"^<LISTENING>", "Dial tone on, waiting for a call", "clear"),
-    (r"^Heard: (\S+)", "Number dialed: %s", None),
     (r"^(?:Response: )?CONNECT (\d+)", "Carrier up at %s bps", "speed"),
     (r"^DCNet Call answered", "Online via DCNET{speed}", None),
     (r"Call answered", "Answered, starting PPP{speed}", None),

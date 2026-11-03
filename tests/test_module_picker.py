@@ -59,11 +59,11 @@ class ManifestTests(PickerBase):
         got = dict((m["name"], m) for m in mods.listing())
         self.assertIs(got["fixed"]["visible"], False)                    # the page shows it without a switch
         self.assertIs(got["switcher"]["visible"], False)
-        self.assertIs(got["numbers"]["visible"], True)
+        self.assertIs(got["led"]["visible"], True)
         self.assertTrue(got["fixed"]["enabled"])
-        core.save_module_order(["fixed", "numbers"])
+        core.save_module_order(["fixed", "led"])
         settings_only = [m["name"] for m in mods.listing() if m["group"] == 1]
-        self.assertEqual(settings_only[:2], ["fixed", "numbers"])     # and it can be placed anywhere in the order of its group
+        self.assertEqual(settings_only[:2], ["fixed", "led"])     # and it can be placed anywhere in the order of its group
 
 
 class ShownInThePickerTests(PickerBase):
@@ -95,19 +95,19 @@ class OrderTests(PickerBase):
         names = core.module_names()
         plain = [n for n in names if core.module_group(n) == 1]            # modules with no layout.json are settings-only: group 1
         self.assertEqual(plain[-2:], ["aaa", "zzz"])                     # no hint = 100: after the hinted ones of the group, by name
-        self.assertLess(names.index("switcher"), names.index("numbers"))
+        self.assertLess(names.index("switcher"), names.index("led"))
 
     def test_the_saved_order_wins_and_new_modules_go_last(self):
-        core.save_module_order(["wifi", "numbers", "nosuchmodule"])
+        core.save_module_order(["wifi", "led", "nosuchmodule"])
         settings_only = lambda: [n for n in core.module_names() if core.module_group(n) == 1]          # the order is kept inside each group
-        self.assertEqual(settings_only()[:2], ["wifi", "numbers"])
+        self.assertEqual(settings_only()[:2], ["wifi", "led"])
         self.assertNotIn("nosuchmodule", core.module_names())
         self.add("later", {"name": "Later", "description": "d", "enabled": True, "order": 1})
-        self.assertEqual(settings_only()[:2], ["wifi", "numbers"])
+        self.assertEqual(settings_only()[:2], ["wifi", "led"])
         self.assertEqual(settings_only()[-1], "later")                # not in the saved list yet: after it
 
     def test_a_bad_order_is_refused_and_a_broken_file_is_ignored(self):
-        self.assertIsNone(core.save_module_order("numbers"))
+        self.assertIsNone(core.save_module_order("led"))
         self.assertIsNone(core.save_module_order([1, 2]))
         with open(core.MODULE_ORDER, "w") as f:
             f.write("{oops")
@@ -138,23 +138,23 @@ class HttpOrderTests(PickerBase):
         return urlopen(req, timeout=10)
 
     def test_post_order_moves_modules_and_the_menu_follows(self):
-        got = json.loads(self.post("/modules/order", {"order": ["rebootupdate", "numbers", "players"]}).read())["modules"]
+        got = json.loads(self.post("/modules/order", {"order": ["rebootupdate", "led", "players"]}).read())["modules"]
         names = [m["name"] for m in got]
-        self.assertLess(names.index("rebootupdate"), names.index("numbers"))                # a move inside a group is kept
+        self.assertLess(names.index("rebootupdate"), names.index("led"))                # a move inside a group is kept
         self.assertLess(names.index("players"), names.index("rebootupdate"))                 # a dashboard module stays above the settings-only ones
         again = json.loads(urlopen(self.base + "/modules", timeout=10).read())["modules"]
         self.assertEqual([m["name"] for m in again], [m["name"] for m in got])
 
     def test_api_carries_which_modules_are_on(self):
         en = json.loads(urlopen(self.base + "/api", timeout=10).read())["enabled"]
-        self.assertTrue(en["switcher"] and en["numbers"])
+        self.assertTrue(en["switcher"] and en["led"])
         self.assertFalse(en["background"])                                 # off by default, but listed: its switch in Appearance follows this
         self.post("/modules", {"name": "background", "enabled": True})
         self.assertTrue(json.loads(urlopen(self.base + "/api", timeout=10).read())["enabled"]["background"])
 
     def test_post_order_rejects_junk(self):
         with self.assertRaises(HTTPError) as e:
-            self.post("/modules/order", {"order": "numbers"})
+            self.post("/modules/order", {"order": "led"})
         self.assertEqual(e.exception.code, 400)
 
     def test_a_hidden_module_cannot_be_switched_off_over_http(self):
