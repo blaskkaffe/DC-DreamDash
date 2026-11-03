@@ -98,5 +98,5 @@ def port_view(p):
     return {"name": PORT_NAMES[p["port"]] if p["port"] < len(PORT_NAMES) else str(p["port"] + 1),
             "port": p["port"], "kind": STATUS_KIND.get(p["state"], "empty"), "status": STATUS_TEXT.get(p["state"], "Empty"),
             "short": SHORT_STATUS.get(p["state"], "Empty"),
-            "console_name": CONSOLE_NAMES.get(p["dev_mode"], "") if p["state"] != STATE_EMPTY else "",
+            "console_name": CONSOLE_NAMES.get(p["dev_mode"], "") if p["state"] == STATE_BT else "",      # a wired controller's type is not known to the adapter
             "type": p["dev_mode"], "type_text": label(TYPES, p["dev_mode"]), "acc": p["acc_mode"], "acc_text": label(ACCS, p["acc_mode"])}

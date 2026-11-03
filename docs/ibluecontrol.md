@@ -6,7 +6,8 @@ Back to [CLAUDE.md](../CLAUDE.md). Module folder: `modules/ibluecontrol/`. Defau
 
 A dashboard box headed **iBluecontrolmod/blueretro** with four port tiles (A to D). Each is coloured in the port's palette colour (full colour for Bluetooth, paler for wired, only the border for an empty port) (A orange, B green, C blue, D bright pink as the nearest to the Dreamcast's magenta; change them in Settings > Appearance) and has the port letter, then **BT**,
 **Wired** or **Empty**, and at the bottom the name the adapter tells the Dreamcast for that port (Controller, Keyboard or Mouse; the
-"Dreamcast " of the Maple name is left out so it fits; nothing for an empty port). Normal and Dual stick both say Controller; the popup shows which. Tapping a button opens a
+"Dreamcast " of the Maple name is left out so it fits; nothing for an empty port). Normal and Dual stick both say Controller; the popup shows which.
+**A wired port** shows no name and has no settings: the adapter only sees that something is plugged in, not what it is, so its popup just says so. Tapping a button opens a
 pop-up under the row, **also for a port that has a controller**, with:
 
 - **Controller type**: the Dreamcast output mode of that port (BlueRetro `GamePad`, `GamePadAlt`, `Keyboard`, `Mouse`; shown as Normal,
@@ -60,3 +61,7 @@ Everything here is tested with the simulated adapter only. Open questions for a 
    unknown.
 3. The scan finds the adapter by its advertised service UUID or a name containing "BlueRetro".
 4. The firmware command `0x4B` has not been compiled or flashed (no ESP-IDF build here).
+
+## Later
+
+- Read what is plugged into a wired port (and its settings) from openMenu on the Dreamcast, over the modem or the serial link the openMenu module already uses. Not started; the adapter itself cannot see it.

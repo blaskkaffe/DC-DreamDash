@@ -13,7 +13,8 @@ custom("iblue-ports",function(host){
   msg="Working...";paint();
   post(url,body,function(r,st,b){var m=b||r;msg=m&&m.message?m.message:"";reloadData("iblue");paint()})}
  function opt(text,on,fn,disabled){
-  var b=h("button",{type:"button","class":"pill-s"+(on?" on":""),text:text});b.disabled=!!disabled;b.onclick=fn;return b}
+  var b=h("button",{type:"button","class":"pill-s"+(on?" on":""),text:text});b.disabled=!!disabled;b.onclick=fn;
+  b.style.cssText="display:flex;align-items:center;justify-content:center;min-height:44px;padding-top:0;padding-bottom:0;line-height:1.1;text-align:center";return b}
  function group(label,items,cols){
   var t=h("div",{"class":"t",text:label});t.style.marginTop=popEl.children.length>1?"14px":"0";
   var row=h("div",{"class":"optrow"},items);row.style.cssText="display:grid;grid-template-columns:"+(cols?"repeat("+cols+",minmax(0,1fr))":"repeat(auto-fit,minmax(6em,1fr))")+";gap:"+(cols?"6px":"8px");
@@ -21,9 +22,11 @@ custom("iblue-ports",function(host){
   popEl.appendChild(t);popEl.appendChild(row)}
  function drawPop(v){
   var port=v.ports[sel];if(!port)return;
-  var k=JSON.stringify([sel,port.type,port.acc,v.busy,v.profiles]);if(k===popKey)return;popKey=k;
+  var k=JSON.stringify([sel,port.kind,port.type,port.acc,v.busy,v.profiles]);if(k===popKey)return;popKey=k;
   popEl.innerHTML="";
   popEl.appendChild(h("div",{"class":"t",text:"Port "+port.name+" - "+port.status}));
+  if(port.kind==="wired"){      // the adapter cannot tell what a wired controller is: nothing to set
+   popEl.appendChild(h("div",{"class":"sub",text:"A wired controller is connected. The adapter can't tell what type it is, so there are no settings for it."}));return}
   var off=!v.online||v.busy;
   group("Controller type",v.types.map(function(t){
    return opt(t.label,t.value===port.type,function(){send("/iblue/port",{port:port.port,type:t.value,acc:port.acc})},off)}));
