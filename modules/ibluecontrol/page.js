@@ -15,8 +15,10 @@ custom("iblue-ports",function(host){
  function opt(text,on,fn,disabled){
   var b=h("button",{type:"button","class":"pill-s"+(on?" on":""),text:text});b.disabled=!!disabled;b.onclick=fn;return b}
  function group(label,items){
-  popEl.appendChild(h("div",{"class":"t",text:label}));
-  popEl.appendChild(h("div",{"class":"optrow"},items))}
+  var t=h("div",{"class":"t",text:label});t.style.marginTop=popEl.children.length>1?"14px":"0";
+  var row=h("div",{"class":"optrow"},items);row.style.cssText="display:grid;grid-template-columns:repeat(auto-fit,minmax(6em,1fr));gap:8px";
+  items.forEach(function(b){b.style.width="100%"});
+  popEl.appendChild(t);popEl.appendChild(row)}
  function drawPop(v){
   var port=v.ports[sel];if(!port)return;
   var k=JSON.stringify([sel,port.type,port.acc,v.busy,v.profiles]);if(k===popKey)return;popKey=k;
@@ -28,7 +30,7 @@ custom("iblue-ports",function(host){
   group("Accessory",v.accs.map(function(a){
    return opt(a.label,a.value===port.acc,function(){send("/iblue/port",{port:port.port,type:port.type,acc:a.value})},off)}));
   var profs=(v.profiles||[]).filter(function(x){return x.used});
-  group("Profile (loads the saved controller mapping for all ports)",profs.length?profs.map(function(x){
+  group("Profile (also loads the button mapping, for all ports)",profs.length?profs.map(function(x){
    return opt(x.name,false,function(){if(confirm("Load profile “"+x.name+"”? It replaces the adapter's current configuration."))send("/iblue/profile",{slot:x.slot})},off)}):[h("span",{"class":"sub",text:"No saved profiles on the adapter"})])}
  function paint(){
   var v=view();if(!v)return;
@@ -36,10 +38,13 @@ custom("iblue-ports",function(host){
   if(k!==key){key=k;grid.innerHTML="";
    v.ports.forEach(function(x,i){
     var b=h("button",{type:"button","class":"pill-s"+(i===sel?" on":""),"aria-label":"Port "+x.name+": "+x.status+(x.type_text?", "+x.type_text:"")});
-    b.style.cssText="flex-direction:column;height:auto;padding:8px 4px;white-space:normal";
-    var d=h("span",{"class":"dot"+(x.kind==="bt"||x.kind==="wired"?" ok":"")});
-    b.appendChild(h("b",{text:x.name}));b.appendChild(d);b.appendChild(h("span",{text:x.status}));
-    b.appendChild(h("span",{"class":"sub",text:x.type_text||" "}));
+    b.style.cssText="flex-direction:column;justify-content:flex-start;height:auto;min-height:7.5em;padding:10px 2px 8px;gap:4px;border-radius:var(--r-box);white-space:normal;line-height:1.2";
+    var top=h("span",{"class":"iblue-top"},[h("b",{text:x.name}),h("span",{"class":"dot"+(x.kind==="bt"||x.kind==="wired"?" ok":"")})]);
+    top.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;font-size:1.15em";
+    var lines=x.status.split("-"),st=h("span",{"class":"iblue-status"},lines.map(function(l){return h("span",{text:l})}));      // "BT-connected" on two lines: BT / connected
+    st.style.cssText="display:flex;flex-direction:column;align-items:center;min-height:2.4em;justify-content:center;font-size:.78em";
+    var ty=h("span",{"class":"sub",text:x.type_text||"\u00a0"});ty.style.cssText="margin-top:auto;font-size:.72em;white-space:nowrap";
+    b.appendChild(top);b.appendChild(st);b.appendChild(ty);
     b.disabled=!v.online;
     b.onclick=function(e){e.stopPropagation();sel=i;popKey="";key="";p.open(grid);paint()};     // anchored to the row: paint() rebuilds the buttons
     grid.appendChild(b)})}
