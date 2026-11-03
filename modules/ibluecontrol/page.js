@@ -38,7 +38,7 @@ custom("iblue-ports",function(host){
   if(k!==key){key=k;grid.innerHTML="";
    v.ports.forEach(function(x,i){
     var pc=colourId("port_"+x.name.toLowerCase(),"ibluecontrol"),b=h("button",{type:"button","class":"pill-s pri"+(pc?" c-"+pc:""),"aria-label":"Port "+x.name+": "+x.status+(x.type_text?", "+x.type_text:"")});      // the whole tile in the port's colour (A orange, B green, C blue, D magenta by default)
-    b.style.cssText="flex-direction:column;justify-content:flex-start;height:auto;min-height:7em;padding:12px 2px 10px;gap:6px;border-radius:var(--r-ctl);white-space:normal;line-height:1.2"+(i===sel?";box-shadow:0 0 0 3px var(--text-1)":"")+(x.kind==="empty"?";opacity:.55":"");
+    b.style.cssText="flex-direction:column;justify-content:flex-start;height:auto;min-height:7em;padding:12px 2px 10px;gap:6px;border-radius:var(--r-ctl);white-space:normal;line-height:1.2"+(i===sel?";box-shadow:0 0 0 3px var(--text-1)":"")+(x.kind==="empty"?";background:transparent;text-shadow:none;color:var(--text-2)":x.kind==="wired"?";opacity:.55":"");      // empty: only the border; wired: the paler fill; Bluetooth: the full colour
     var top=h("b",{text:x.name});top.style.cssText="font-size:1.6em;line-height:1";                    // the port letter
     var st=h("span",{text:x.short||x.status});st.style.cssText="font-size:.9em";                           // BT, Wired or Empty
     var ty=h("span",{text:x.console_name||"\u00a0"});                                                     // what the controller tells the console: Controller, Keyboard, Mouse

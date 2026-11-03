@@ -29,7 +29,7 @@ TYPES = [(0, "Normal"), (1, "Dual stick"), (2, "Keyboard"), (3, "Mouse")]
 # without "Dreamcast " so that the longest, "Controller", fits a small tile. Normal and Dual stick both say "Controller".
 CONSOLE_NAMES = {0: "Controller", 1: "Controller", 2: "Keyboard", 3: "Mouse"}
 SHORT_STATUS = {STATE_EMPTY: "Empty", STATE_BT: "BT", STATE_WIRED: "Wired"}
-ACCS = [(0, "None"), (1, "Memory"), (2, "Rumble"), (3, "Both")]
+ACCS = [(0, "None"), (1, "VMU"), (2, "Rumble"), (3, "Both")]
 PROFILE_RESULT = {0: "OK", 1: "That profile slot is empty", 2: "Bad request", 3: "Could not write it in the adapter"}
 
 
