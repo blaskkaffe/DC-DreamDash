@@ -1,0 +1,9 @@
+{
+ "name": "DC API",
+ "description": "The Dreamcast ecosystem's control language (dc1): the Dreamcast, the adapters and this Pi ask each other who they are and what they can do. POST /dcapi answers hello, the network and live changes. No box of its own.",
+ "enabled": true,
+ "visible": true,
+ "order": 99,
+ "ui": 2,
+ "web": "netswitch_api"
+}

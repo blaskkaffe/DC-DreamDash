@@ -14,11 +14,11 @@ from urllib.request import Request, urlopen
 from support import ROOT, web, core, sandbox, cleanup
 
 REAL_MODULES = os.path.join(ROOT, "modules")
-NAMES = ["background", "clock", "debuglog", "events", "imagebg", "led", "openmenu", "players", "rebootupdate", "snow", "wifi"]      # the modules the picker can switch
+NAMES = ["api", "background", "clock", "debuglog", "events", "imagebg", "led", "openmenu", "players", "rebootupdate", "snow", "wifi"]      # the modules the picker can switch
 HIDDEN = ["switcher", "system"]                                                # always on, not in the picker
 ALL = sorted(NAMES + HIDDEN)
 # a path only that module answers (GET, or POST when None)
-ENDPOINT = {"background": ("GET", "/background/dc-background.js"), "clock": ("GET", "/clock"), "events": ("GET", "/events/view"), "imagebg": ("GET", "/imagebg"), "openmenu": ("GET", "/openmenu/view"), "players": ("GET", "/players"), "debuglog": ("GET", "/dtmf"),
+ENDPOINT = {"api": ("GET", "/dcapi"), "background": ("GET", "/background/dc-background.js"), "clock": ("GET", "/clock"), "events": ("GET", "/events/view"), "imagebg": ("GET", "/imagebg"), "openmenu": ("GET", "/openmenu/view"), "players": ("GET", "/players"), "debuglog": ("GET", "/dtmf"),
             "led": ("GET", "/ledconfig"), "wifi": ("POST", "/wifitoggle"), "rebootupdate": ("GET", "/update"), "snow": ("GET", "/snow")}
 HIDDEN_ENDPOINT = {"switcher": ("GET", "/status"), "system": ("GET", "/about")}
 BASE_IDS = ('id="dash"', 'id="set-boxes"', 'id="settings"', 'id="bg"', 'id="warnings"')
@@ -129,7 +129,7 @@ class RepoModules(unittest.TestCase):
 
     def test_defaults(self):
         on = dict((n, json.load(open(os.path.join(REAL_MODULES, n, "module.json")))["enabled"]) for n in ALL)
-        self.assertEqual(on, {"background": False, "clock": True, "debuglog": False, "events": True, "imagebg": False, "led": True, "openmenu": True, "players": True, "rebootupdate": True, "snow": False, "switcher": True, "system": True, "wifi": False})
+        self.assertEqual(on, {"api": True, "background": False, "clock": True, "debuglog": False, "events": True, "imagebg": False, "led": True, "openmenu": True, "players": True, "rebootupdate": True, "snow": False, "switcher": True, "system": True, "wifi": False})
         hidden = [n for n in ALL if json.load(open(os.path.join(REAL_MODULES, n, "module.json")))["visible"] is False]
         self.assertEqual(hidden, HIDDEN)                   # the network switcher and the system info can't be switched off
 
@@ -208,7 +208,7 @@ class WithEverything(Base):
         core.save_module_order(["switcher", "clock", "players", "events", "openmenu", "debuglog", "led", "system", "wifi", "rebootupdate", "imagebg", "background"])
         new = core.save_dashboard_order(["debuglog", "players", "clock"])                                   # three tiles moved: they take each other's places
         self.assertEqual(new[:6], ["switcher", "debuglog", "players", "events", "openmenu", "clock"])
-        self.assertEqual(new[6:], ["led", "system", "wifi", "rebootupdate", "imagebg", "background", "snow"])
+        self.assertEqual(new[6:], ["led", "system", "wifi", "rebootupdate", "api", "imagebg", "background", "snow"])
         self.assertEqual(core.save_dashboard_order(["nope", "events"])[:6], ["switcher", "debuglog", "players", "events", "openmenu", "clock"])      # unknown names are ignored
         self.assertIsNone(core.save_dashboard_order("clock"))
 
@@ -220,7 +220,7 @@ class WithEverything(Base):
 
     def test_modules_menu_lists_them_all(self):
         got = self.json("/modules")["modules"]
-        self.assertEqual([m["name"] for m in got], ["switcher", "clock", "players", "events", "openmenu", "debuglog", "led", "system", "wifi", "rebootupdate", "imagebg", "snow", "background"])   # picker order, the always-on modules included
+        self.assertEqual([m["name"] for m in got], ["switcher", "clock", "players", "events", "openmenu", "debuglog", "led", "system", "wifi", "rebootupdate", "api", "imagebg", "snow", "background"])   # picker order, the always-on modules included
         self.assertEqual([m["name"] for m in got if m["visible"] is False], ["switcher", "system"])                     # which the page lists without a switch
         self.assertTrue(all(m["enabled"] for m in got))
         self.assertTrue(all(m["title"] and m["description"] for m in got))

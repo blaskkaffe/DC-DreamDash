@@ -83,9 +83,6 @@ def _selected_colour():
     return _network_colour_id("dcnet" if os.path.exists(state.FLAG) else "dcnow")
 
 
-SERVICES = {"colour:network": _selected_colour}
-
-
 def _selected():
     dcnet = os.path.exists(state.FLAG)
     net = "dcnet" if dcnet else "dcnow"
@@ -162,19 +159,40 @@ def _source(h):
     return "openMenu" if (h.headers.get("X-Requested-With") or "").strip().lower() == "openmenu" else "web page"
 
 
+def select_network(net, who):
+    """Select the network "dcnow" or "dcnet" (the choice applies from the next call). Used by the two buttons below and, through the service
+    "net:select", by the DC API module."""
+    if net == "dcnet":
+        open(state.FLAG, "w").close()
+        core.debug_log("%s: DCNET selected" % who)
+    else:
+        if os.path.exists(state.FLAG):
+            os.remove(state.FLAG)
+        core.debug_log("%s: DCNow! selected" % who)
+
+
 def _select(net):
     """POST /dcnow and POST /dcnet: the two network buttons of the page, and the same two buttons in openMenu. Both send the same
     request, so the same code answers (204 with X-Requested-With, 303 for a plain form post). The choice applies from the next call."""
     def handler(h):
-        who = _source(h)
-        if net == "dcnet":
-            open(state.FLAG, "w").close()
-            core.debug_log("%s: DCNET selected" % who)
-        else:
-            if os.path.exists(state.FLAG):
-                os.remove(state.FLAG)
-            core.debug_log("%s: DCNow! selected" % who)
+        select_network(net, _source(h))
     return handler
+
+
+def _net_select(net, who="DC API"):
+    """Service "net:select": "ok" after selecting the network, else a short reason ("bad" when it is not dcnow or dcnet)."""
+    if net not in ("dcnow", "dcnet"):
+        return "bad"
+    select_network(net, who)
+    return "ok"
+
+
+def _net_state():
+    """Service "net:state": {"selected": "dcnow"|"dcnet", "call": "dcnow"|"dcnet"|None (the call DreamPi is in), "dcnet": "ok" or why not
+    (noupdates / config / disabled / inactive)}."""
+    parts = (core.read_file(state.STATE) or "").split()
+    call = parts[1] if len(parts) >= 3 and parts[0] == "call" and parts[1] in ("dcnow", "dcnet") else None
+    return {"selected": "dcnet" if os.path.exists(state.FLAG) else "dcnow", "call": call, "dcnet": state.dcnet_code()}
 
 
 def _hangup(h):
@@ -250,3 +268,4 @@ def _tag(h):
 GET = {"/status": _status, "/buttonconfig": _get_buttons, "/tag": _tag}
 OPEN = ("/dcnow", "/dcnet", "/hangup")       # the dashboard's buttons (and openMenu's) work while Settings is locked with the PIN
 POST = {"/dcnow": _select("dcnow"), "/dcnet": _select("dcnet"), "/hangup": _hangup, "/buttonconfig": _post_buttons}
+SERVICES = {"colour:network": _selected_colour, "net:select": _net_select, "net:state": _net_state}   # what the other modules ask through core.service()

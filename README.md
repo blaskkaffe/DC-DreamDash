@@ -129,6 +129,11 @@ Whatever number the Dreamcast dials, DreamPi answers as usual. Netlink/XBAND dia
 If DCNET isn't available, the web page says so and every call goes to DCNow!.
 
 
+## DC API (`dc1`)
+
+`POST /dcapi` is this Pi's end of the control language the Dreamcast devices are meant to share (hello, the network, events, `call net.select`). Written and host-tested only; openMenu has no client for it yet. Language and keys: `docs/dcapi.md`.
+
+
 ## Telling openMenu which network runs
 
 `GET /tag` on the web port answers with one short code (`DCNET`, `DCNOW`, `DCNET_OFF`, `INACTIVE`; `/tag?text` gives "Running DCNet!" and so on) for openMenu to read over the PPP link when it is connected through the Pi, so it can show a small "Running DCNet!" tag. Nothing is pushed to the Dreamcast and games are unaffected. The Pi side is done; openMenu has to ask for it. Details, the code table and what is not verified yet: `docs/openmenu.md`.
