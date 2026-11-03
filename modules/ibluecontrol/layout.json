@@ -1,0 +1,66 @@
+{
+ "data": {
+  "iblue": {
+   "url": "/iblue/view",
+   "every": 5,
+   "retry": 3
+  }
+ },
+ "dashboard": [
+  {
+   "box": "iblue",
+   "items": [
+    {
+     "type": "infobox",
+     "label": "iBluecontrolmod/blueretro",
+     "rows": [
+      {
+       "label": "",
+       "main": true,
+       "full": true,
+       "value": {
+        "type": "custom",
+        "name": "iblue-ports"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "box": "appearance",
+   "title": "Appearance",
+   "items": [
+    {
+     "type": "row",
+     "title": "iBlueControlMod colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "ibluecontrol",
+      "tint": true,
+      "title": "Colour of the iBlueControlMod box"
+     }
+    }
+   ]
+  },
+  {
+   "box": "iblue controlmod",
+   "title": "iBlueControlMod",
+   "items": [
+    {
+     "type": "row",
+     "title": "Adapter",
+     "sub": "@iblue_device",
+     "control": {
+      "type": "button",
+      "label": "Search again",
+      "post": "/iblue/rescan"
+     }
+    }
+   ]
+  }
+ ]
+}

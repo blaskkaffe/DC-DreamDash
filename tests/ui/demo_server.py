@@ -2,7 +2,7 @@
 service on a sandbox (all paths in a temp dir). Switches via environment:
 LEDS=n (default 3), WIFI=1, WIFIDEMO=1 (dummy Wi-Fi networks + the setup loop),
 BG=1 (the Dreamcast background module on), SNOW=1 (the Snow background module on), CABLE=1|call (the network box's Serial PPP and KOSnet rows, as with the RP2040 Dreamcast cable), IMGBG=1 (the Background image module on), CLOCK=1 (the clock module on; off by default so the box counts are stable), EVENTS=1 (the DC99 events module on, with its sample events; EVENTSOON=1 adds a reminded event 5 minutes ahead), OPENMENU=1 (the openMenu link module on, with a made-up SD card of 72 games and a Dreamcast that polls every 3 s; OPENMENU=quiet: the Dreamcast never polls), FAKEUPDATE=1 (fake GitHub: an update is available; FAKELOG=1 adds a failed update with a messy log), FAKEPLAYERS=1 (made-up
-players; PLAYERSFAST=1 makes the downloads slow and the list stale after 3 s), OFF=led,wifi,... (modules switched off in the module picker; OFF=all = every module the picker can switch, only the always-on ones stay), PIN=1234 (a PIN for update/restart/Wi-Fi; restart is faked), PORT=n (default 8734)."""
+players; PLAYERSFAST=1 makes the downloads slow and the list stale after 3 s), IBLUE=1 (the iBlueControlMod box on a simulated adapter), OFF=led,wifi,... (modules switched off in the module picker; OFF=all = every module the picker can switch, only the always-on ones stay), PIN=1234 (a PIN for update/restart/Wi-Fi; restart is faked), PORT=n (default 8734)."""
 import sys, os, threading, time, json
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from support import web, core, sandbox, ledconfig
@@ -28,6 +28,11 @@ if os.environ.get("EVENTS"):
                  [r for r in (ev.normalize(e) for e in ev.sample_events()) if r])
         demo = ev.query("title=?", ("Demo Game Night",))[0]
         ev.save_config({"picked": [str(demo["id"])]}); ev.write_reminders()
+if os.environ.get("IBLUE"):                   # IBLUE=1: the iBlueControlMod box with the module's service on a simulated adapter (no Bluetooth)
+    import asyncio, netswitch_iblue_service as ib
+    core.save_module_enabled("ibluecontrol", True)
+    open(ib.DEMO, "w").close()
+    threading.Thread(target=lambda: asyncio.run(ib.main()), daemon=True).start()
 if not os.environ.get("OPENMENU"): core.save_module_enabled("openmenu", False)      # likewise: the openMenu link box only with OPENMENU=1
 if os.environ.get("OPENMENU"):
     import netswitch_openmenu as om

@@ -11,6 +11,8 @@ Check this before saying something works. Anything not listed under Verified has
 
 ## Not yet verified
 
+- The iBlueControlMod / BlueRetro module (`modules/ibluecontrol/`, [ibluecontrol.md](ibluecontrol.md)): the protocol parsing, the web requests and the service are tested off-hardware against a simulated adapter, and the page was looked at in headless Chromium. Nothing has been run against a real adapter or with the Pi's Bluetooth: whether the adapter accepts a connection outside its 60 s pairing window, whether a short config connection shifts the controllers' ports, and the firmware's new port-status command `0x4B` (not compiled or flashed).
+
 - Allow / Restore of `/boot/noautoupdates.txt` (Settings > System; `tests/test_autoupdates.py`): the backup, the removal and the restore are tested off-hardware with a stand-in for `systemd-run`. Not run on a Pi: that the transient systemd unit can really write to `/boot` (the web service's own unit is sandboxed with `ProtectSystem=full`, which is why the change is made that way), and that DreamPi then writes a fresh `netlink_config.ini` at its next start.
 
 

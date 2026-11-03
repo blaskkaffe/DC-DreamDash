@@ -1,0 +1,17 @@
+{
+ "name": "iBlueControlMod / BlueRetro",
+ "description": "Shows the four controller ports of an iBlueControlMod (BlueRetro) adapter over Bluetooth and lets you change controller type, accessory and profile for each.",
+ "note": "Needs the iBlueControlMod firmware with the port status command and the Python bleak package (the installer adds it).",
+ "enabled": false,
+ "visible": true,
+ "order": 18,
+ "ui": 2,
+ "web": "netswitch_ibluecontrol",
+ "colours": {
+  "ibluecontrol": "blue"
+ },
+ "primary": "ibluecontrol",
+ "tints": {
+  "ibluecontrol": false
+ }
+}
