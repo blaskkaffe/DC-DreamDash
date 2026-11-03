@@ -25,6 +25,10 @@ STATUS_KIND = {STATE_EMPTY: "empty", STATE_BT: "bt", STATE_WIRED: "wired"}
 
 # the Dreamcast output modes (BlueRetro: GamePad, GamePadAlt, Keyboard, Mouse) and accessories, as the web config numbers them
 TYPES = [(0, "Normal"), (1, "Dual stick"), (2, "Keyboard"), (3, "Mouse")]
+# what the adapter tells the Dreamcast in its Maple device info (main/wired/maple.c: "Dreamcast Controller", "Dreamcast Mouse", "Keyboard"),
+# without "Dreamcast " so that the longest, "Controller", fits a small tile. Normal and Dual stick both say "Controller".
+CONSOLE_NAMES = {0: "Controller", 1: "Controller", 2: "Keyboard", 3: "Mouse"}
+SHORT_STATUS = {STATE_EMPTY: "Empty", STATE_BT: "BT", STATE_WIRED: "Wired"}
 ACCS = [(0, "None"), (1, "Memory"), (2, "Rumble"), (3, "Both")]
 PROFILE_RESULT = {0: "OK", 1: "That profile slot is empty", 2: "Bad request", 3: "Could not write it in the adapter"}
 
@@ -93,4 +97,6 @@ def port_view(p):
     """One port as the page shows it."""
     return {"name": PORT_NAMES[p["port"]] if p["port"] < len(PORT_NAMES) else str(p["port"] + 1),
             "port": p["port"], "kind": STATUS_KIND.get(p["state"], "empty"), "status": STATUS_TEXT.get(p["state"], "Empty"),
+            "short": SHORT_STATUS.get(p["state"], "Empty"),
+            "console_name": CONSOLE_NAMES.get(p["dev_mode"], "") if p["state"] != STATE_EMPTY else "",
             "type": p["dev_mode"], "type_text": label(TYPES, p["dev_mode"]), "acc": p["acc_mode"], "acc_text": label(ACCS, p["acc_mode"])}

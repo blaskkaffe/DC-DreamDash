@@ -32,6 +32,9 @@ class Proto(unittest.TestCase):
         self.assertEqual([x["name"] for x in v], ["A", "B", "C", "D"])
         self.assertEqual((v[0]["type_text"], v[1]["type_text"], v[3]["type_text"]), ("Normal", "Dual stick", "Mouse"))
         self.assertEqual(v[0]["acc_text"], "Both")
+        self.assertEqual([x["short"] for x in v], ["BT", "Wired", "Empty", "BT"])
+        self.assertEqual([x["console_name"] for x in v], ["Controller", "Controller", "", "Mouse"])     # an empty port has no name
+        self.assertEqual(proto.CONSOLE_NAMES[2], "Keyboard")
 
     def test_a_short_answer_gives_fewer_ports_not_an_error(self):
         self.assertEqual(proto.parse_ports(b""), [])

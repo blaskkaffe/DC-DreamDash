@@ -44,7 +44,7 @@ def view():
     if fresh and st.get("ports"):
         ports = [proto.port_view(p) for p in st["ports"]]
     else:
-        ports = [{"name": n, "port": i, "kind": "none", "status": "No adapter", "type": 0, "type_text": "", "acc": 0, "acc_text": ""}
+        ports = [{"name": n, "port": i, "kind": "none", "status": "No adapter", "short": "No adapter", "console_name": "", "type": 0, "type_text": "", "acc": 0, "acc_text": ""}
                  for i, n in enumerate(proto.PORT_NAMES)]
     pending = os.path.exists(REQUEST)
     if not fresh:

@@ -4,8 +4,9 @@ Back to [CLAUDE.md](../CLAUDE.md). Module folder: `modules/ibluecontrol/`. Defau
 
 ## What it does
 
-A dashboard box headed **iBluecontrolmod/blueretro** with four port buttons (A to D). Each says what is in the port, **BT-connected**,
-**Wired-connected** or **Empty**, and under that the controller type (Normal, Dual stick, Keyboard, Mouse). Tapping a button opens a
+A dashboard box headed **iBluecontrolmod/blueretro** with four port tiles (A to D). Each has the port letter with a dot centred under it, then **BT**,
+**Wired** or **Empty**, and at the bottom the name the adapter tells the Dreamcast for that port (Controller, Keyboard or Mouse; the
+"Dreamcast " of the Maple name is left out so it fits; nothing for an empty port). Normal and Dual stick both say Controller; the popup shows which. Tapping a button opens a
 pop-up under the row, **also for a port that has a controller**, with:
 
 - **Controller type**: the Dreamcast output mode of that port (BlueRetro `GamePad`, `GamePadAlt`, `Keyboard`, `Mouse`; shown as Normal,

@@ -38,12 +38,14 @@ custom("iblue-ports",function(host){
   if(k!==key){key=k;grid.innerHTML="";
    v.ports.forEach(function(x,i){
     var b=h("button",{type:"button","class":"pill-s"+(i===sel?" on":""),"aria-label":"Port "+x.name+": "+x.status+(x.type_text?", "+x.type_text:"")});
-    b.style.cssText="flex-direction:column;justify-content:flex-start;height:auto;min-height:8em;padding:12px 2px 10px;gap:6px;border-radius:var(--r-ctl);white-space:normal;line-height:1.2";
-    var top=h("span",{"class":"iblue-top"},[h("b",{text:x.name}),h("span",{"class":"dot"+(x.kind==="bt"||x.kind==="wired"?" ok":"")})]);
-    top.style.cssText="display:flex;align-items:center;justify-content:center;gap:8px;font-size:1.4em;line-height:1";
-    var lines=x.status.split("-"),st=h("span",{"class":"iblue-status"},lines.map(function(l){return h("span",{text:l})}));      // "BT-connected" on two lines: BT / connected
-    st.style.cssText=(x.kind==="empty"?"opacity:.6;":"")+"display:flex;flex-direction:column;align-items:center;min-height:2.4em;justify-content:center;font-size:.78em";
-    var ty=h("span",{"class":"sub",text:x.type_text||"\u00a0"});ty.style.cssText="margin-top:auto;padding-top:6px;font-size:.74em;white-space:nowrap;width:86%;border-top:1px solid currentColor;opacity:.75";
+    b.style.cssText="flex-direction:column;justify-content:flex-start;height:auto;min-height:7.5em;padding:12px 2px 10px;gap:6px;border-radius:var(--r-ctl);white-space:normal;line-height:1.2";
+    var top=h("span",{"class":"iblue-top"},[h("b",{text:x.name}),h("span",{"class":"dot"+(x.kind==="bt"||x.kind==="wired"?" ok":"")})]);   // the letter, the dot centred under it
+    top.style.cssText="display:flex;flex-direction:column;align-items:center;gap:6px;font-size:1.4em;line-height:1";
+    top.lastChild.style.margin="0";
+    var st=h("span",{"class":"iblue-status",text:x.short||x.status});      // BT, Wired or Empty
+    st.style.cssText=(x.kind==="empty"?"opacity:.6;":"")+"font-size:.9em;margin-top:2px";
+    var ty=h("span",{"class":"sub",text:x.console_name||"\u00a0"});       // what the controller tells the console: Controller, Keyboard, Mouse
+    ty.style.cssText="margin-top:auto;padding-top:6px;font-size:.74em;white-space:nowrap;width:90%;opacity:.75;border-top:"+(x.console_name?"1px solid currentColor":"1px solid transparent");
     b.appendChild(top);b.appendChild(st);b.appendChild(ty);
     b.disabled=!v.online;
     b.onclick=function(e){e.stopPropagation();sel=i;popKey="";key="";p.open(grid);paint()};     // anchored to the row: paint() rebuilds the buttons
