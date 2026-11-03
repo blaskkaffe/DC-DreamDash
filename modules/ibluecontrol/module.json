@@ -8,7 +8,11 @@
  "ui": 2,
  "web": "netswitch_ibluecontrol",
  "colours": {
-  "ibluecontrol": "blue"
+  "ibluecontrol": "blue",
+  "port_a": "orange",
+  "port_b": "green",
+  "port_c": "blue",
+  "port_d": "bright-pink"
  },
  "primary": "ibluecontrol",
  "tints": {

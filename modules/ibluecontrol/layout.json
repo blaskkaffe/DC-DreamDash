@@ -43,6 +43,46 @@
       "tint": true,
       "title": "Colour of the iBlueControlMod box"
      }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port A colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_a",
+      "title": "Colour of port A"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port B colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_b",
+      "title": "Colour of port B"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port C colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_c",
+      "title": "Colour of port C"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port D colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_d",
+      "title": "Colour of port D"
+     }
     }
    ]
   },

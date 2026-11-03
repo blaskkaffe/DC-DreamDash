@@ -4,14 +4,14 @@ Back to [CLAUDE.md](../CLAUDE.md). Module folder: `modules/ibluecontrol/`. Defau
 
 ## What it does
 
-A dashboard box headed **iBluecontrolmod/blueretro** with four port tiles (A to D). Each has the port letter with a dot centred under it, then **BT**,
+A dashboard box headed **iBluecontrolmod/blueretro** with four port tiles (A to D). Each is coloured in the port's palette colour (A orange, B green, C blue, D bright pink as the nearest to the Dreamcast's magenta; change them in Settings > Appearance) and has the port letter, then **BT**,
 **Wired** or **Empty**, and at the bottom the name the adapter tells the Dreamcast for that port (Controller, Keyboard or Mouse; the
 "Dreamcast " of the Maple name is left out so it fits; nothing for an empty port). Normal and Dual stick both say Controller; the popup shows which. Tapping a button opens a
 pop-up under the row, **also for a port that has a controller**, with:
 
 - **Controller type**: the Dreamcast output mode of that port (BlueRetro `GamePad`, `GamePadAlt`, `Keyboard`, `Mouse`; shown as Normal,
   Dual stick, Keyboard, Mouse. "Dual stick" is the label for `GamePadAlt`; check it against your adapter).
-- **Accessory**: None, Memory, Rumble, Both (the port's accessory mode).
+- **Accessory**: None, Memory, Rumble, Both (the port's accessory mode), four in a row.
 - **Profile**: loads one of the adapter's saved profiles. A profile is a copy of the whole BlueRetro configuration, mapping included, so
   loading one changes the button mapping of all ports. Editing single buttons of the mapping is not in this module (use blueretro.io).
 
