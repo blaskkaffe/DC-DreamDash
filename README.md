@@ -319,7 +319,7 @@ The optional **Dreamcast background** module comes from the [VMU Icon Maker](htt
 
 ## License
 
-**This add-on has no license file yet.** Until the owner chooses one, the default applies: the code is copyrighted by its author and may not be reused or redistributed without permission. (A license is being decided; this section and a `LICENSE` file will be added with it.)
+This add-on is released under the **MIT License**, see [LICENSE](LICENSE) (Copyright (c) 2026 blaskkaffe and DC-DreamDash contributors).
 
 Third-party material it contains or uses:
 
@@ -327,5 +327,5 @@ Third-party material it contains or uses:
 - **DreamPi** (Kazade/dreampi) and **Netlink** (eaudunord/Netlink): separate projects with their own licenses. This add-on neither includes nor changes any of their code; it hooks into them at run time.
 - **Logos**: the DreamPi logo and the Flycast logo used as tab icons (`static/`) belong to those projects.
 - **Button sounds** (`base/sounds/*.wav`): their origin and license are not recorded yet; to be confirmed.
-- The documents in [docs/unified/](docs/unified/README.md) are project notes for the DC- family; no separate license has been set for them.
+- The documents in [docs/unified/](docs/unified/README.md) are covered by the same MIT license. For the licenses of the other repositories in the family see the table there.
 

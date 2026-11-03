@@ -159,6 +159,30 @@ class LiveInfo(Base):
     def poll_lines(self):
         return self.call("GET", POLL)[1].splitlines()
 
+    def test_the_network_of_the_current_call_goes_back_to_the_dreamcast(self):
+        self.upload2()
+        self.assertFalse([l for l in self.poll_lines() if l.startswith("CALL")])    # no state file: the Pi does not know, the line is left out
+        for state, line in (("call dcnow", "CALL dcnow"), ("call dcnet", "CALL dcnet")):
+            with open(om.STATE, "w") as f:
+                f.write("%s %d\n" % (state, int(time.time())))
+            self.assertIn(line, self.poll_lines())
+        for state in ("ready", "starting", "unknown", "call other", "garbage"):    # not in a call on one of the two networks: left out
+            with open(om.STATE, "w") as f:
+                f.write("%s %d\n" % (state, int(time.time())))
+            self.assertFalse([l for l in self.poll_lines() if l.startswith("CALL")], state)
+
+    def test_selected_and_connected_can_differ(self):
+        """DCNET is selected but the call that is up went to DCNow! (selected during the call): openMenu sees both."""
+        self.upload2()
+        open(om.FLAG, "w").close()
+        with open(om.NET_STATE, "w") as f:
+            json.dump({"time": time.time(), "dcnet_code": "ok"}, f)
+        with open(om.STATE, "w") as f:
+            f.write("call dcnow %d\n" % int(time.time()))
+        lines = self.poll_lines()
+        self.assertIn("NET dcnet", lines)
+        self.assertIn("CALL dcnow", lines)
+
     def test_the_selected_network_goes_back_to_the_dreamcast(self):
         self.upload2()
         self.assertIn("NET dcnow", self.poll_lines())

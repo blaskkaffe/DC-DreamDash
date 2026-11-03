@@ -12,6 +12,9 @@
 # Events are not handled here: the events module owns them (GET /api/events/upcoming). Nothing is pushed to the Dreamcast:
 # a launch waits until openMenu asks. The answer to a poll also carries short lines of live info for the Dreamcast:
 #   NET dcnet|dcnow                               the network calls go to now (dcnet only when it is selected and DreamPi can use it)
+#   CALL dcnet|dcnow                              the network the call openMenu is in right now is connected to (the hook's state file); left
+#                                                 out when the Pi does not know. Together with NET (the selected network) openMenu can tell
+#                                                 whether it is on the network that is selected
 #   DCNET ok | DCNET off <why>                    whether DCNET works: why = config (netlink_config.ini not found), disabled ([DCNet] enabled =
 #                                                 yes missing), noupdates (/boot/noautoupdates.txt) or inactive (DreamPi is not running the add-on)
 #   PLY 2:3 1:1 27:2                              the card's games (slot:players) that someone plays online right now, the most played first
@@ -48,6 +51,7 @@ _state = {"seen": 0.0, "pending": None, "pending_time": 0.0, "launched": None, "
 # ------------------------------------------------------------------ game list
 FLAG = os.path.join(core.BASE_DIR, "dcnet_mode")   # exists = DCNET is the selected network (the network switcher's)
 NET_STATE = core.TMP_PREFIX + ".net"          # the network switcher's measurements (JSON, rewritten every few seconds)
+STATE = core.TMP_PREFIX + ".state"             # DreamPi's state, written by the hook: "<starting|ready|call dcnow|call dcnet> <unix time>"
 NET_STALE = 20                                 # ... ignored when older than this (the web service is down)
 
 
@@ -238,6 +242,18 @@ def network():
     return "dcnet" if os.path.exists(FLAG) and dcnet_code() == "ok" else "dcnow"
 
 
+def call_network():
+    """'dcnow' or 'dcnet' while DreamPi is in a call on that network (the hook's state file), else None."""
+    try:
+        with open(STATE) as f:
+            words = f.read().split()
+    except (IOError, OSError):
+        return None
+    if len(words) >= 2 and words[0] == "call" and words[1] in ("dcnow", "dcnet"):
+        return words[1]
+    return None
+
+
 # ------------------------------------------------------------------ the launch handshake
 def poll_reply(headers_query):
     """What openMenu is told. headers_query: the query string of GET /openmenu/poll."""
@@ -258,6 +274,9 @@ def poll_reply(headers_query):
     lines.append("NET " + network())
     code = dcnet_code()
     lines.append("DCNET ok" if code == "ok" else "DCNET off " + code)
+    on = call_network()
+    if on:
+        lines.append("CALL " + on)
     players, _table, age = players_file()
     playing = playing_now(players)
     if playing:
