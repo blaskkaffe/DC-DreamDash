@@ -131,6 +131,17 @@ class Lang(unittest.TestCase):
         self.assertEqual(len([l for l in out if l.startswith("ev ")]), api.RING)
         self.assertNotIn("ok events.lost 1", self.ask("get events since=%d" % (api._dropped[0] + 1)))
 
+    def test_no_baseline_while_the_switcher_is_missing(self):
+        orig = core.service
+        core.service = lambda *a: None
+        try:
+            api.observe()
+            self.assertIsNone(api._last[0])
+        finally:
+            core.service = orig
+        api.observe()                                         # now it is there: this is the baseline, no events
+        self.assertEqual(self.ask("get events since=0"), ["dc1", "ok events.next 1"])
+
     def test_without_the_switcher_there_are_no_net_keys(self):
         orig = core.service
         core.service = lambda *a: None

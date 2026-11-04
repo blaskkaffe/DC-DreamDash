@@ -64,6 +64,8 @@ def observe():
     """Look for changes since the last look and keep them for `get events`."""
     now = values()
     with _lock:
+        if _last[0] is None and not now:
+            return now                  # the network switcher is not there yet: no baseline, or its first values would look like changes
         if _last[0] is not None:
             for key in sorted(set(now) | set(_last[0])):
                 if now.get(key) != _last[0].get(key):
