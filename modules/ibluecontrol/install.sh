@@ -3,8 +3,12 @@
 # it is switched on in Settings > Modules. Nothing of DreamPi is touched.
 if ! python3 -c "import bleak" >/dev/null 2>&1; then
     echo "Installing bleak (Bluetooth LE for the iBlueControlMod module)..."
-    pip3 install --break-system-packages bleak >/dev/null 2>&1 || pip3 install bleak >/dev/null 2>&1 \
-        || echo "Could not install bleak automatically; run: pip3 install bleak"
+    # the Debian / Raspberry Pi OS package first (no pip needed, works with the system Python), pip as the fallback
+    { apt-get update -qq >/dev/null 2>&1; apt-get install -y python3-bleak >/dev/null 2>&1; } \
+        || python3 -m pip install --break-system-packages bleak >/dev/null 2>&1 \
+        || python3 -m pip install bleak >/dev/null 2>&1
+    python3 -c "import bleak" >/dev/null 2>&1 \
+        || echo "WARNING: could not install bleak for the iBlueControlMod module. Run: sudo apt install python3-bleak"
 fi
 cat > /etc/systemd/system/dreampi-netswitch-iblue.service <<UNIT
 [Unit]

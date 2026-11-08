@@ -27,7 +27,7 @@ iBlueControlMod) forgets the adapter's address.
 | `netswitch_ibluecontrol.py` | Web entry: `GET /iblue/view` (what the box shows), `POST /iblue/port {port, type, acc}`, `POST /iblue/profile {slot}`, `POST /iblue/rescan`. Writes requests as a file, never talks Bluetooth. |
 | `netswitch_iblue_service.py` | The module's own service `dreampi-netswitch-iblue` (root; the only code using Bluetooth, through the Python package `bleak` and BlueZ). |
 | `page.js` | The custom widget `iblue-ports`. |
-| `install.sh` / `remove.sh` | Install `bleak` (pip) and the service; remove them. DreamPi's own files are never touched. |
+| `install.sh` / `remove.sh` | Install `bleak` (apt `python3-bleak`, pip as fallback) and the service; remove them. DreamPi's own files are never touched. |
 
 State files (no sockets between the web service and the service): `/tmp/dreampi-netswitch.iblue` (service to web: ports, profiles,
 last result, error), `.iblue_request` (web to service, one request at a time), `.iblue_seen` (touched by every `GET /iblue/view`),
