@@ -204,8 +204,10 @@ async def main():
                     st = {"found": False, "error": "Adapter not found. Tap its button to open pairing, then wait a moment"}
                 else:
                     st = await session(False, lambda: _RealCtx(address))
-        except ImportError:
-            st = {"found": False, "error": "The Python package bleak is missing (pip3 install bleak)"}
+        except ImportError as e:        # bleak itself, or one of its own requirements (dbus_fast, typing_extensions ...)
+            core.debug_log("iblue: import failed: %s" % e)
+            st = {"found": False, "error": "Bluetooth library problem on python %d.%d (%s): %s. Try: sudo apt install python3-bleak"
+                  % (sys.version_info[0], sys.version_info[1], sys.executable, e)}
         except Exception as e:      # noqa: B902 - a failed connection is a state, not a crash
             core.debug_log("iblue: %s" % e)
             st = {"found": False, "error": "Could not reach the adapter (%s)" % (str(e) or e.__class__.__name__)}
