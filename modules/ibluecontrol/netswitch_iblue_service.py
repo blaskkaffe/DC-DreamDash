@@ -209,7 +209,7 @@ async def main():
                     st = await session(False, lambda: _RealCtx(address))
         except ImportError as e:        # bleak itself, or one of its own requirements (dbus_fast, typing_extensions ...)
             core.debug_log("iblue: import failed: %s" % e)
-            fix = "curl -fsSL https://bootstrap.pypa.io/pip/3.7/get-pip.py | sudo python3 && sudo python3 -m pip install 'bleak<0.21'" if sys.version_info < (3, 8) else "sudo apt install python3-bleak"
+            fix = "sudo apt install -y python3-distutils && curl -fsSL https://bootstrap.pypa.io/pip/3.7/get-pip.py | sudo python3 && sudo python3 -m pip install 'bleak<0.21'" if sys.version_info < (3, 8) else "sudo apt install python3-bleak"
             st = {"found": False, "error": "Bluetooth library problem on python %d.%d (%s): %s. Try: %s"
                   % (sys.version_info[0], sys.version_info[1], sys.executable, e, fix)}
         except Exception as e:      # noqa: B902 - a failed connection is a state, not a crash
