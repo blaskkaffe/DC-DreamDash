@@ -102,10 +102,13 @@ async def find_address():
         pass
     if saved:
         return saved
-    found = await BleakScanner.discover(timeout=SCAN, return_adv=True)
-    for address, (dev, adv) in found.items():
-        name = (dev.name or adv.local_name or "")
-        if proto.SERVICE in [u.lower() for u in (adv.service_uuids or [])] or "blueretro" in name.lower():
+    try:
+        found = await BleakScanner.discover(timeout=SCAN, return_adv=True)      # {address: (device, advertisement)}
+        seen = [(addr, dev.name or adv.local_name or "", adv.service_uuids or []) for addr, (dev, adv) in found.items()]
+    except TypeError:       # older bleak (the Python 3.7 of the old DreamPi image): a list of devices
+        seen = [(d.address, d.name or "", (getattr(d, "metadata", None) or {}).get("uuids", [])) for d in await BleakScanner.discover(timeout=SCAN)]
+    for address, name, uuids in seen:
+        if proto.SERVICE in [u.lower() for u in uuids] or "blueretro" in name.lower():
             with open(web.DEVICE, "w") as f:
                 f.write(address)
             return address

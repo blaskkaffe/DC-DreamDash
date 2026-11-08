@@ -3,12 +3,15 @@
 # it is switched on in Settings > Modules. Nothing of DreamPi is touched.
 if ! python3 -c "import bleak" >/dev/null 2>&1; then
     echo "Installing bleak (Bluetooth LE for the iBlueControlMod module)..."
-    # the Debian / Raspberry Pi OS package first (no pip needed, works with the system Python), pip as the fallback
+    # bleak 0.21 and newer need Python 3.8; the old DreamPi image (Raspbian Buster) has 3.7, which takes bleak 0.20
+    BLEAK="bleak"
+    [ "$(python3 -c 'import sys; print(sys.version_info[1])' 2>/dev/null || echo 9)" -lt 8 ] && BLEAK="bleak<0.21"
+    # the Debian / Raspberry Pi OS package first (newer systems), then pip (installed first when it is missing)
     { apt-get update -qq >/dev/null 2>&1; apt-get install -y python3-bleak >/dev/null 2>&1; } \
-        || python3 -m pip install --break-system-packages bleak >/dev/null 2>&1 \
-        || python3 -m pip install bleak >/dev/null 2>&1
+        || { python3 -m pip --version >/dev/null 2>&1 || apt-get install -y python3-pip >/dev/null 2>&1
+             python3 -m pip install --break-system-packages "$BLEAK" >/dev/null 2>&1 || python3 -m pip install "$BLEAK" >/dev/null 2>&1; }
     python3 -c "import bleak" >/dev/null 2>&1 \
-        || echo "WARNING: could not install bleak for the iBlueControlMod module. Run: sudo apt install python3-bleak"
+        || echo "WARNING: could not install bleak for the iBlueControlMod module. Run: sudo apt install -y python3-pip && sudo pip3 install 'bleak<0.21'"
 fi
 cat > /etc/systemd/system/dreampi-netswitch-iblue.service <<UNIT
 [Unit]
