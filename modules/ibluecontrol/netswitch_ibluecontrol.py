@@ -48,7 +48,7 @@ def view():
                  for i, n in enumerate(proto.PORT_NAMES)]
     pending = os.path.exists(REQUEST)
     if not fresh:
-        note = st.get("error") or "Looking for the adapter (tap its button to open pairing if it is not found)"
+        note = st.get("error") or "Looking for the iBlueControlMod"
     else:
         note = st.get("error") or ""
     res = st.get("result") or {}

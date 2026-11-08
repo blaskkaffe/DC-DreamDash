@@ -204,7 +204,7 @@ async def main():
             else:
                 address = await find_address()
                 if not address:
-                    st = {"found": False, "error": "Adapter not found. Tap its button to open pairing, then wait a moment"}
+                    st = {"found": False, "error": "iBlueControlMod not found. Turn the Dreamcast on and wait a few seconds."}
                 else:
                     st = await session(False, lambda: _RealCtx(address))
         except ImportError as e:        # bleak itself, or one of its own requirements (dbus_fast, typing_extensions ...)

@@ -53,9 +53,10 @@ at once when the page asks for a change.
 
 Everything here is tested with the simulated adapter only. Open questions for a first run on a real adapter:
 
-1. **Can the Pi connect at all outside the pairing window?** The firmware only runs inquiry/advertising for 60 s after power-on or a
-   tap on the button (`CONFIG_BLUERETRO_IBLUE_PAIR_WINDOW_S`). If it does not accept a Bluetooth LE connection outside that window, the
-   box says "Adapter not found. Tap its button..." and the firmware needs a small change (always connectable for config).
+1. **Can the Pi connect at any time?** From the firmware source it should: the 60 s window (`CONFIG_BLUERETRO_IBLUE_PAIR_WINDOW_S`) only
+   gates pairing of new controllers (classic Bluetooth inquiry, `bt_hci_start_inquiry`), while the LE advertisement the config service
+   uses is switched on at start-up and never stopped. Not tried against a real adapter. The box says "iBlueControlMod not found" if the
+   Pi's Bluetooth sees no device named BlueRetro.
 2. **Does a short config connection move the controllers?** A connected config client takes one of the adapter's Bluetooth device slots,
    and the firmware numbers ports by slot. The module keeps the connection short for that reason; whether ports shift during it is
    unknown.
