@@ -11,6 +11,8 @@ Check this before saying something works. Anything not listed under Verified has
 
 ## Not yet verified
 
+- The iBlueControlMod / BlueRetro module (`modules/ibluecontrol/`, [ibluecontrol.md](ibluecontrol.md)): the protocol parsing, the web requests and the service are tested off-hardware against a simulated adapter, and the page was looked at in headless Chromium. Nothing has been run against a real adapter or with the Pi's Bluetooth: whether the adapter accepts a connection outside its 60 s pairing window, whether a short config connection shifts the controllers' ports, and the firmware's port-status command `0x50` (built in the iBlueControlMod firmware's `unified`, not run on an adapter).
+
 - The Snow background (from the `checkin2.0` branch; `core.daylight()`, `base_tz.sun_elevation()`): its settings, the module system with it and the sun's height are tested off-hardware; the storm was looked at in headless Chromium with a software WebGL (dark and light page, no console errors). Not tried on a real screen or on the Pi's own browser: the frame rate and the load of WebGL on a weak device.
 
 - Button sounds (from the `checkin2.0` branch): the sound files, the `/sounds/` route, the settings and the form are tested off-hardware; the playback in a real browser on the user's device has not been tried here.

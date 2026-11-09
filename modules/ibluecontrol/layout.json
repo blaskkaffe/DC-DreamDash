@@ -1,0 +1,106 @@
+{
+ "data": {
+  "iblue": {
+   "url": "/iblue/view",
+   "every": 5,
+   "retry": 3
+  }
+ },
+ "dashboard": [
+  {
+   "box": "iblue",
+   "items": [
+    {
+     "type": "infobox",
+     "label": "iBluecontrolmod/blueretro",
+     "rows": [
+      {
+       "label": "",
+       "main": true,
+       "full": true,
+       "value": {
+        "type": "custom",
+        "name": "iblue-ports"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "box": "appearance",
+   "title": "Appearance",
+   "items": [
+    {
+     "type": "row",
+     "title": "iBlueControlMod colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "ibluecontrol",
+      "tint": true,
+      "title": "Colour of the iBlueControlMod box"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port A colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_a",
+      "title": "Colour of port A"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port B colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_b",
+      "title": "Colour of port B"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port C colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_c",
+      "title": "Colour of port C"
+     }
+    },
+    {
+     "type": "row",
+     "title": "iBlueControlMod port D colour",
+     "sub": "Module",
+     "control": {
+      "type": "swatches",
+      "key": "port_d",
+      "title": "Colour of port D"
+     }
+    }
+   ]
+  },
+  {
+   "box": "iblue controlmod",
+   "title": "iBlueControlMod",
+   "items": [
+    {
+     "type": "row",
+     "title": "Adapter",
+     "sub": "@iblue_device",
+     "control": {
+      "type": "button",
+      "label": "Search again",
+      "post": "/iblue/rescan"
+     }
+    }
+   ]
+  }
+ ]
+}
